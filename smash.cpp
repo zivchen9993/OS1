@@ -51,14 +51,13 @@ int main(int argc, char *argv[])
     exit (-1);
   L_Fg_Cmd[0] = '\0';
   Terminal *my_terminal = new Terminal();
+
   while (1)
   {
-    printf("smash > ");
+    std::cerr << "smash > ";
     fgets(lineSize, MAX_LINE_SIZE, stdin);
     strcpy(cmdString, lineSize);
     cmdString[strlen(lineSize)-1]='\0';
-    // perform a complicated Command
-    if(!ExeComp(lineSize)) continue;
     // background command
     if(!BgCmd(lineSize, jobs)) continue;
     // built in commands

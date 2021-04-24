@@ -32,65 +32,39 @@ int ExeCmd(void* jobs, char* lineSize, char* cmdString, Terminal& my_terminal)
     args[i] = strtok(NULL, delimiters);
     if (args[i] != NULL)
       num_arg++;
-
   }
-
-  if (strcmp(args[0], "history")) {
-    /*char *new_command = new char[MAXCMDLEN];
-    int cntr = 0;
-    for (i=0; i<num_arg; i++){
-         if (args[i] != NULL){
-           strcpy((new_command + cntr), args[i]);
-           cntr += (strlen(args[i]) + 1);
-           strcpy((new_command + (cntr-1)), " ");
-         }
-     }
-    strcpy((new_command + (cntr + 1)), "\0");
-    my_terminal.push_hist(new_command);
-  }
-  */
-    /*vector<string> list_command;
+int is_hist = strcmp(args[0], "history");
+  if (is_hist) {
+    list<string> list_command;
     for (int i = 0; i < num_arg + 1; i++) {
       string tmp(args[i]);
       list_command.push_back(tmp);
     }
-    for (auto it = list_command.cbegin(); it != list_command.cend(); it++) {
-      std::cout << *it << " ";
-    }
-    std::cout << std::endl;
-  }*/
-    //my_terminal.push_hist(new_command);
+    my_terminal.push_hist(list_command);
   }
+
 //******************************************* our additions
-  bool last_cd_exist = false;
+
 /*************************************************/
 // Built in Commands PLEASE NOTE NOT ALL REQUIRED
 // ARE IN THIS CHAIN OF IF COMMANDS. PLEASE ADD
 // MORE IF STATEMENTS AS REQUIRED
 /*************************************************/
-  /*if (!strcmp(cmd, "cd") ) {
-
-      if ((args[1] == "-") && (last_cd_exist));
-      {
-          int ret_val_cdir = chdir(last_cd);
-          if (ret_val_cdir == -1) {
-              cout << "\"" << cmdString << "\" " << "- No such file or directory" << endl;
-          }
-
-
-          strcpy(last_cd_tmp, temp_path);
-
-
-          if (ret_val_cdir == -1) {
-              cout << "\"" << cmdString << "\" " << "- No such file or directory" << endl;
-          } else {
-
-              strcpy(last_cd, temp_path);
-              last_cd_exist = true;
-          }
+  if (!strcmp(cmd, "cd") ) {
+    if (!(strcmp(args[1],"-"))){
+      my_terminal.switch_addr();
+      chdir(my_terminal.last_dir());
+    } else {
+      int ret_val_cdir = chdir(args[1]);
+      if (ret_val_cdir == -1) {
+        cerr <<"smash error:> No such file or directory" << endl;
+      } else {
+        string tmp(args[1]);
+        my_terminal.push_last_cwd(tmp);
       }
+    }
   }
-  */
+
   /*************************************************/
   /*else*/ if (!strcmp(cmd, "pwd"))
   {
@@ -99,9 +73,22 @@ int ExeCmd(void* jobs, char* lineSize, char* cmdString, Terminal& my_terminal)
   }
 
     /*************************************************/
-  else if (!strcmp(cmd, "mkdir"))
+    /**
+     *change this!!!! to syscall
+     */
+  else if (!strcmp(cmd, "cp"))
   {
-
+      std::ifstream src(args[1], std::ios::binary);
+      std::ofstream dest(args[2], std::ios::binary);
+      dest << src.rdbuf();
+      if (src && dest){
+        cout << args[1] << " has been copied to " << args[2] << endl;
+      } else {
+        /**
+         * understand what error means!!!
+         */
+        cout << " error copy " << endl;
+      }
   }
     /*************************************************/
 
@@ -129,6 +116,46 @@ int ExeCmd(void* jobs, char* lineSize, char* cmdString, Terminal& my_terminal)
   {
     my_terminal.print_hist();
   }
+    /*************************************************/
+  else if (!strcmp(cmd, "diff"))
+  {
+    fstream f1, f2;
+    char name[80], c1, c2;
+    int flag=3;
+    bool correct_files = true;
+
+    strcpy(name, args[1]);
+    f1.open(name,ios::in);
+    if(!(f1)) {
+      cerr << "1" << endl;
+      correct_files = false;
+    }
+    strcpy(name, args[2]);
+    f2.open(name,ios::in);
+    if(!(f2) && correct_files) {
+      cerr << "1" << endl;
+      correct_files = false;
+    }
+      while(1 && correct_files){
+        c1=f1.get();
+        c2=f2.get();
+        if(c1!=c2){
+          flag=0;
+          break;
+        }
+        if((c1==EOF)||(c2==EOF)){
+          break;
+        }
+      }
+      f1.close();
+      f2.close();
+      if(flag && correct_files) {
+        cout << "0" << endl;
+      } else if (correct_files && !(flag)){
+        cout << "1" << endl;
+      }
+    }
+
     /*************************************************/
   else if (!strcmp(cmd, "quit"))
   {
@@ -185,26 +212,6 @@ void ExeExternal(char *args[MAX_ARG], char* cmdString)
   }
 }
 //**************************************************************************************
-// function name: ExeComp
-// Description: executes complicated command
-// Parameters: command string
-// Returns: 0- if complicated -1- if not
-//**************************************************************************************
-int ExeComp(char* lineSize)
-{
-  char ExtCmd[MAX_LINE_SIZE+2];
-  char *args[MAX_ARG];
-  if ((strstr(lineSize, "|")) || (strstr(lineSize, "<")) || (strstr(lineSize, ">")) || (strstr(lineSize, "*")) || (strstr(lineSize, "?")) || (strstr(lineSize, ">>")) || (strstr(lineSize, "|&")))
-  {
-    // Add your code here (execute a complicated command)
-
-    /*
-    your code
-    */
-  }
-  return -1;
-}
-//**************************************************************************************
 // function name: BgCmd
 // Description: if command is in background, insert the command to jobs
 // Parameters: command string, pointer to jobs
@@ -228,11 +235,3 @@ int BgCmd(char* lineSize, void* jobs)
   }
   return -1;
 }
-
-/*
- * char *new_data = new char[strlen(str.data)+1];
-    strcpy(new_data,str.data);
-    new_data[strlen(str.data)] = '\0';
-    this->data = new_data;
-    this->length = str.length;
- */

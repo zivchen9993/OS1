@@ -1,18 +1,29 @@
 //
 // Created by os on 20.4.2021.
 //
-
+#include <stdio.h>
+#include <string.h>
 #include "Terminal_class.h"
 #include <iostream>
 #include <list>
 #include <iterator>
 #include <vector>
+#define MAXPATHLEN 2048
 
+using namespace std;
 Terminal::Terminal(){
-  using namespace std;
-  list_last.resize(1);
+  char temp[MAXPATHLEN];
+  (getcwd(temp, sizeof(temp)));
+  int i = 0;
+  string init_cwd = "";
+  while (temp[i]){
+    init_cwd = init_cwd + temp[i];
+    i++;
+  }
+  list_last.push_front(init_cwd);
+  list_last.push_front(init_cwd);
+  list_last.resize(2);
   list_hist.resize(50);
-
 };
 
 Terminal::~Terminal(){
@@ -22,25 +33,38 @@ Terminal::~Terminal(){
 */
 }
 
-void Terminal::push_hist(const char *new_cmd){
+void Terminal::push_hist(std::list<std::string> new_cmd){
   list_hist.push_front(new_cmd);
 
 }
-/*
-void Terminal::push_hist(std::list){
-  list_hist.push_front(new_cmd);
-
+void Terminal::switch_addr(){
+  list_last.reverse();
 }
-*/
-void Terminal::push_last_cwd(char *last_cwd){
+
+const char* Terminal::last_dir(){
+  return list_last.begin()->c_str();
+}
+
+void Terminal::push_last_cwd(std::string last_cwd){
   list_last.push_front(last_cwd);
 }
 /**
- * make sure what "auto" is!!!
+ * check case of >= 50 commands
+ *
  */
 void Terminal::print_hist(){
-  for (auto it = list_hist.cbegin(); it != list_hist.cend(); it++) {
-    std::cout << *it << std::endl;
+  int cntr = (int)list_hist.size();
+  for (list<list<string>>::iterator itr = list_hist.begin();
+                                    cntr > 0;
+                                    itr++, cntr--) {
+    if (!(itr->empty())){
+      for (list<string>::iterator it = itr->begin(); it != itr->end(); it++) {
+        cout << *it << " ";
+
+      }
+      cout << endl;
+    }
   }
 }
+
 
