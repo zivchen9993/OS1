@@ -14,6 +14,7 @@ class Terminal {
 
   std::list<std::string> list_last;
   std::list<std::list<std::string>> list_hist;
+  int process_counter;
 
 
  public:

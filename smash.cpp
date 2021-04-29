@@ -16,6 +16,7 @@ main file. This file contains the main function of smash
 #include <iostream>
 #include <string.h>
 #include "Terminal_class.h"
+#include "Jobs.h"
 
 char* L_Fg_Cmd;
 void* jobs = NULL; //This represents the list of jobs. Please change to a preferred type (e.g array of char*)
