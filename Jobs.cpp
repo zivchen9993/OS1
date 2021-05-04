@@ -27,9 +27,9 @@ Jobs::~Jobs(){
 */
 }
 
-bool Jobs::add_job(string p_name, int p_pid){
+bool Jobs::add_job(string p_name){
     process_counter++;
-    list_jobs.push_back(SingleJob(process_counter, p_name, p_pid));
+    list_jobs.push_back(SingleJob(process_counter, p_name));
 }
 
 bool Jobs::remove_job(int p_num){

@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <vector>
+#include <unistd.h>
 //********************************************
 // function name: ExeCmd
 // Description: interperts and executes built-in commands
@@ -99,7 +100,7 @@ int is_hist = strcmp(args[0], "history");
     /*************************************************/
   else if (!strcmp(cmd, "showpid"))
   {
-
+    cout << "smash pid is " << getpid() << endl;
   }
     /*************************************************/
   else if (!strcmp(cmd, "fg"))
@@ -189,18 +190,15 @@ void ExeExternal(char *args[MAX_ARG], char* cmdString)
     case -1:
       // Add your code here (error)
 
-      /*
-      your code
-      */
+      perror("");
+
     case 0 :
       // Child Process
       setpgrp();
 
       // Add your code here (execute an external command)
-
-      /*
-      your code
-      */
+      cout << ("t") << endl;
+      execv(cmdString, args);
 
     default:
       // Add your code here
@@ -235,3 +233,4 @@ int BgCmd(char* lineSize, void* jobs)
   }
   return -1;
 }
+

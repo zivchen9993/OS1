@@ -23,11 +23,11 @@
 
 using namespace std;
 
-SingleJob::SingleJob(int p_num, string p_name, int p_pid){
+SingleJob::SingleJob(int p_num, string p_name){
 
     proc_num = p_num;
     proc_name = p_name;
-    pid = p_pid;
+    pid = getpid();
     system_clock::time_point start_time = std::chrono::system_clock::now();
     is_stopped = false;
 };

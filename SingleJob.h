@@ -41,7 +41,7 @@ public:
 
    // SingleJob();
 
-    SingleJob(int p_num, std::string p_name, int p_pid);
+    SingleJob(int p_num, std::string p_name);
 
     ~SingleJob();
 

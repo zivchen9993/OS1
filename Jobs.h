@@ -15,6 +15,7 @@
 #include <sys/wait.h>
 #include "Terminal_class.h"
 #include "SingleJob.h"
+#include "Jobs.h"
 #include <fstream>
 #include <list>
 #include <iterator>
@@ -35,7 +36,7 @@ public:
 
     ~Jobs();
 
-    bool add_job(std::string p_name, int p_pid);
+    bool add_job(std::string p_name);
 
     bool remove_job(int p_num);
 
