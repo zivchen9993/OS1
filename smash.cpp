@@ -19,7 +19,8 @@ main file. This file contains the main function of smash
 #include "Jobs.h"
 
 char* L_Fg_Cmd;
-void* jobs = NULL; //This represents the list of jobs. Please change to a preferred type (e.g array of char*)
+
+//void* jobs = NULL; //This represents the list of jobs. Please change to a preferred type (e.g array of char*)
 char lineSize[MAX_LINE_SIZE];
 //**************************************************************************************
 // function name: main
@@ -52,7 +53,8 @@ int main(int argc, char *argv[])
     exit (-1);
   L_Fg_Cmd[0] = '\0';
   Terminal *my_terminal = new Terminal();
-
+  Jobs *my_jobs = new Jobs();
+  my_jobs->add_job(std::string("add me"), getpid());
   while (1)
   {
     std::cerr << "smash > ";
@@ -60,9 +62,9 @@ int main(int argc, char *argv[])
     strcpy(cmdString, lineSize);
     cmdString[strlen(lineSize)-1]='\0';
     // background command
-    if(!BgCmd(lineSize, jobs)) continue;
-    // built in commands
-    ExeCmd(jobs, lineSize, cmdString, *my_terminal);
+    //if(!BgCmd(lineSize, *my_jobs)) continue;
+    // built in commands BgCmd(int num_args, char *args[MAX_ARG], char* cmdString, Jobs& my_jobs)
+    ExeCmd(*my_jobs, lineSize, cmdString, *my_terminal);
 
     /* initialize for next line read*/
     lineSize[0]='\0';

@@ -41,7 +41,7 @@ public:
 
    // SingleJob();
 
-    SingleJob(int p_num, std::string p_name);
+    SingleJob(int p_num, std::string p_name, int p_pid,  system_clock::time_point p_time);
 
     ~SingleJob();
 
@@ -50,6 +50,8 @@ public:
     void change_signal(bool signal);
 
     void print_single_job();
+
+    int get_job_pid();
 
 };
 

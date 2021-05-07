@@ -15,10 +15,11 @@
 
 #define MAX_LINE_SIZE 80
 #define MAX_ARG 20
+
 typedef enum { FALSE , TRUE } bool_;
 int ExeComp(char* lineSize);
-int BgCmd(char* lineSize, void* jobs);
-int ExeCmd(void* jobs, char* lineSize, char* cmdString, Terminal& my_terminal);
-void ExeExternal(char *args[MAX_ARG], char* cmdString);
+int BgCmd(int num_args, char **args, char* cmdString, Jobs& my_jobs);
+int ExeCmd(Jobs& jobs, char* lineSize, char* cmdString, Terminal& my_terminal);
+void ExeExternal(char **args, char* cmdString, Jobs& my_jobs, bool bg_flag);
 #endif
 

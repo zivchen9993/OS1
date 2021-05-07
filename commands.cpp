@@ -4,6 +4,7 @@
 #define MAXCMDLEN 82
 //********************************************
 #include "commands.h"
+//#include "Jobs.h"
 #include <iostream>
 #include <stdio.h>
 #include <string.h>
@@ -16,7 +17,7 @@
 // Returns: 0 - success,1 - failure
 //**************************************************************************************
 using namespace std;
-int ExeCmd(void* jobs, char* lineSize, char* cmdString, Terminal& my_terminal)
+int ExeCmd(Jobs& my_jobs, char* lineSize, char* cmdString, Terminal& my_terminal)
 {
   char* cmd;
   char* args[MAX_ARG];
@@ -34,15 +35,15 @@ int ExeCmd(void* jobs, char* lineSize, char* cmdString, Terminal& my_terminal)
     if (args[i] != NULL)
       num_arg++;
   }
-int is_hist = strcmp(args[0], "history");
-  if (is_hist) {
-    list<string> list_command;
-    for (int i = 0; i < num_arg + 1; i++) {
-      string tmp(args[i]);
-      list_command.push_back(tmp);
-    }
-    my_terminal.push_hist(list_command);
-  }
+    int is_hist = strcmp(args[0], "history");
+      if (is_hist) {
+        list<string> list_command;
+        for (int i = 0; i < num_arg + 1; i++) {
+          string tmp(args[i]);
+          list_command.push_back(tmp);
+        }
+        my_terminal.push_hist(list_command);
+      }
 
 //******************************************* our additions
 
@@ -67,7 +68,7 @@ int is_hist = strcmp(args[0], "history");
   }
 
   /*************************************************/
-  /*else*/ if (!strcmp(cmd, "pwd"))
+  else if ((!strcmp(cmd, "pwd")) && (args[1]==NULL))
   {
     char temp[MAXPATHLEN];
     cout << ( getcwd(temp, sizeof(temp)) ? std::string( temp ) : std::string("") ) << endl;
@@ -77,7 +78,7 @@ int is_hist = strcmp(args[0], "history");
     /**
      *change this!!!! to syscall
      */
-  else if (!strcmp(cmd, "cp"))
+  else if (!strcmp(cmd, "cp") && (args[3]==NULL))
   {
       std::ifstream src(args[1], std::ios::binary);
       std::ofstream dest(args[2], std::ios::binary);
@@ -88,37 +89,38 @@ int is_hist = strcmp(args[0], "history");
         /**
          * understand what error means!!!
          */
-        cout << " error copy " << endl;
+        perror("");
       }
   }
     /*************************************************/
 
-  else if (!strcmp(cmd, "jobs"))
+  else if (!strcmp(cmd, "jobs") && (args[1]==NULL))
   {
-
+      printf("going to print jobs");
+      my_jobs.print_jobs();
   }
     /*************************************************/
-  else if (!strcmp(cmd, "showpid"))
+  else if (!strcmp(cmd, "showpid") && (args[1]==NULL))
   {
     cout << "smash pid is " << getpid() << endl;
   }
     /*************************************************/
-  else if (!strcmp(cmd, "fg"))
+  else if (!strcmp(cmd, "fg") && (args[2]==NULL))
   {
 
   }
     /*************************************************/
-  else if (!strcmp(cmd, "bg"))
+  else if (!strcmp(cmd, "bg") && (args[2]==NULL))
   {
 
   }
     /*************************************************/
-  else if (!strcmp(cmd, "history"))
+  else if (!strcmp(cmd, "history") && (args[1]==NULL))
   {
     my_terminal.print_hist();
   }
     /*************************************************/
-  else if (!strcmp(cmd, "diff"))
+  else if (!strcmp(cmd, "diff") && (args[3]==NULL))
   {
     fstream f1, f2;
     char name[80], c1, c2;
@@ -158,23 +160,23 @@ int is_hist = strcmp(args[0], "history");
     }
 
     /*************************************************/
-  else if (!strcmp(cmd, "quit"))
+  else if (!strcmp(cmd, "quit") && (args[2]==NULL))
   {
 
   }
     /*************************************************/
   else // external command
   {
-    // clear_memory;
-    ExeExternal(args, cmdString);
+      //if (ar)
+      BgCmd(num_arg, args, cmdString, my_jobs);
+      return 0;
+  }
+    if (illegal_cmd == TRUE)
+    {
+        printf("smash error: > \"%s\"\n", cmdString);
+        return 1;
+    }
     return 0;
-  }
-  if (illegal_cmd == TRUE)
-  {
-    printf("smash error: > \"%s\"\n", cmdString);
-    return 1;
-  }
-  return 0;
 }
 //**************************************************************************************
 // function name: ExeExternal
@@ -182,32 +184,46 @@ int is_hist = strcmp(args[0], "history");
 // Parameters: external command arguments, external command string
 // Returns: void
 //**************************************************************************************
-void ExeExternal(char *args[MAX_ARG], char* cmdString)
+void ExeExternal(char **args, char* cmdString, Jobs& my_jobs, bool bg_flag)
 {
-  int pID;
-  switch(pID = fork())
-  {
-    case -1:
-      // Add your code here (error)
+  // clear_memory;
+    //ExeExternal(args, cmdString, my_jobs);
+    int* status;
+    int pID = fork();
+      if (pID != 0 && !bg_flag) {
+          wait(&status);
+      }
+   //   my_jobs.add_job(string(args[0]));
+      switch(pID)
+      {
+          case -1:
+              // Add your code here (error)
 
-      perror("");
+              perror("");
 
-    case 0 :
-      // Child Process
-      setpgrp();
+          case 0 :
+              // Child Process
+              setpgrp();
+              // Add your code here (execute an external command)
+              cout << ("t") << endl;
+              my_jobs.add_job(std::string("case 0 add me"), getpid());
+              my_jobs.add_job(string(args[0]), pID);
+              if ( execv(args[0], args) == -1){
+                  cerr << "smash error: > \"" << cmdString << "\"" << endl;
+                  kill(getpid(), SIGKILL);
+              }
 
-      // Add your code here (execute an external command)
-      cout << ("t") << endl;
-      execv(cmdString, args);
+          default:
+              signal(SIGCHLD, SIG_IGN);
+              my_jobs.add_job(string(args[0]), pID);
+              // Add your code here
 
-    default:
-      // Add your code here
+              cout << ("our default") << endl;
+              /*
+              your code
+              */
+      }
 
-      cout << ("our default") << endl;
-      /*
-      your code
-      */
-  }
 }
 //**************************************************************************************
 // function name: BgCmd
@@ -215,22 +231,16 @@ void ExeExternal(char *args[MAX_ARG], char* cmdString)
 // Parameters: command string, pointer to jobs
 // Returns: 0- BG command -1- if not
 //**************************************************************************************
-int BgCmd(char* lineSize, void* jobs)
+int BgCmd(int num_args, char **args, char* cmdString, Jobs& my_jobs)
 {
 
-  char* Command;
-  char* delimiters = " \t\n";
-  char *args[MAX_ARG];
-  if (lineSize[strlen(lineSize)-2] == '&')
+  if (!strcmp(args[num_args], "&"))
   {
-    lineSize[strlen(lineSize)-2] = '\0';
-    // Add your code here (execute a in the background)
-
-    /*
-    your code
-    */
-
+      args[num_args] = NULL;
+      ExeExternal(args, cmdString, my_jobs, true);
+  } else{
+      ExeExternal(args, cmdString, my_jobs, false);
   }
+
   return -1;
 }
-

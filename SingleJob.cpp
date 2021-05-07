@@ -23,12 +23,13 @@
 
 using namespace std;
 
-SingleJob::SingleJob(int p_num, string p_name){
+SingleJob::SingleJob(int p_num, string p_name, int p_pid, system_clock::time_point p_time){
 
     proc_num = p_num;
     proc_name = p_name;
-    pid = getpid();
-    system_clock::time_point start_time = std::chrono::system_clock::now();
+    pid = p_pid;
+    start_time = p_time;
+
     is_stopped = false;
 };
 
@@ -50,5 +51,9 @@ void SingleJob::change_signal(bool signal){
 void SingleJob::print_single_job(){
     system_clock::time_point curr_time = std::chrono::system_clock::now();
     seconds elap_time = std::chrono::duration_cast<std::chrono::seconds>(curr_time - start_time);
-    cout << proc_num << " " << proc_name << " " << pid << " " << elap_time.count() << " " << (is_stopped ? "(stopped)" : "") << endl;
+    cout << "[" <<proc_num << "] " << proc_name << " " << pid << " " << elap_time.count() << " secs " << (is_stopped ? "(stopped)" : "") << endl;
+}
+
+int SingleJob::get_job_pid(){
+    return pid;
 }
