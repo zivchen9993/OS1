@@ -10,6 +10,7 @@
 #include <string.h>
 #include <vector>
 #include <unistd.h>
+#include <ctype.h>
 //********************************************
 // function name: ExeCmd
 // Description: interperts and executes built-in commands
@@ -107,12 +108,73 @@ int ExeCmd(Jobs& my_jobs, char* lineSize, char* cmdString, Terminal& my_terminal
     /*************************************************/
   else if (!strcmp(cmd, "fg") && (args[2]==NULL))
   {
-
+    if (args[1]==NULL){
+      int pnum_last = my_jobs.get_last_pnum();
+      int pid_last = my_jobs.get_last_pid();
+      kill(pid_last, SIGCONT);
+      my_jobs.change_signal(pnum_last, false);
+      wait(&pid_last);
+    } else {
+      int j = 0;
+      bool is_dig_job;
+      while ((args[1][j])) {
+        char letter = (args[2][j]);
+        is_dig_job = std::isdigit(letter);
+        if (!is_dig_job) {
+          cout << " smash error:> kill " << args[1] <<
+               " - job does not exist " << endl;
+          return 0;
+        }
+        j++;
+      }
+      int pnum = atoi(args[1]);
+      int pid = my_jobs.get_pid(pnum);
+      kill(pid, SIGCONT);
+      my_jobs.change_signal(pnum, false);
+      wait(&pid);
+    }
   }
     /*************************************************/
   else if (!strcmp(cmd, "bg") && (args[2]==NULL))
   {
 
+    if (args[1]==NULL){
+      int pnum_last = my_jobs.get_last_pnum();
+      int pid_last = my_jobs.get_last_pid();
+      if (my_jobs.get_last_signal()){
+        my_jobs.print_last_name();
+        kill(pid_last, SIGCONT);
+        my_jobs.change_signal(pnum_last, false);
+      } else {
+        cout << " smash error:> kill " << args[1] <<
+             " - job does not exist " << endl;
+      }
+    } else {
+      int j = 0;
+      bool is_dig_job;
+      while ((args[1][j])) {
+        char letter = (args[2][j]);
+        is_dig_job = std::isdigit(letter);
+        if (!is_dig_job) {
+          cout << " smash error:> kill " << args[1] <<
+               " - job does not exist " << endl;
+          return 0;
+        }
+        j++;
+      }
+      int pnum = atoi(args[1]);
+      int pid = my_jobs.get_pid(pnum);
+      if (pid == -1){
+        cout << " smash error:> process doesnt exist " << endl;
+        return 0;
+      }
+      if (my_jobs.get_signal(pnum)){
+        kill(pid, SIGCONT);
+        my_jobs.change_signal(pnum, false);
+      } else {
+        cout << " smash error:> process isnt stopped " << endl;
+      }
+    }
   }
     /*************************************************/
   else if (!strcmp(cmd, "history") && (args[1]==NULL))
@@ -160,6 +222,54 @@ int ExeCmd(Jobs& my_jobs, char* lineSize, char* cmdString, Terminal& my_terminal
     }
 
     /*************************************************/
+  else if (!strcmp(cmd, "kill") && (args[3]==NULL))
+  {
+    int j = 0;
+    bool is_dig_job;
+    while ((args[2][j])) {
+      char letter = (args[2][j]);
+      is_dig_job = std::isdigit(letter);
+      if (!is_dig_job) {
+        cout << " smash error:> kill " << args[2] <<
+             " - job does not exist " << endl;
+        return 0;
+      }
+      j++;
+    }
+    int job_num = atoi(args[2]);
+    int needed_pid = my_jobs.get_pid(job_num);
+        if (needed_pid == -1){
+          cout << " smash error:> kill " << args[2] <<
+                                    " - job does not exist " <<  endl;
+          return 0;
+        }
+    int i = 1;
+    bool is_dig_sig;
+    while ((args[1][i]) != '\0'){
+      char letter = args[1][i];
+      is_dig_sig = std::isdigit(letter);
+      if (!is_dig_sig){
+        cout << " smash error:> kill " <<
+             " - cannot send signal " <<  endl;
+        return 0;
+      }
+      i++;
+    }
+    int sig_num = (-1 * atoi(args[1]));
+    int retval = kill(needed_pid, sig_num);
+    if (retval == 0){
+      if ((sig_num == SIGTSTP) || (sig_num == SIGSTOP)){
+        my_jobs.change_signal(job_num, true);
+      }else if (sig_num == SIGCONT){
+        my_jobs.change_signal(job_num, false);
+      }
+    }
+    else if (retval == -1) {
+      cout << " smash error:> kill " <<
+                        " - cannot send signal " << endl;
+    }
+  }
+    /*************************************************/
   else if (!strcmp(cmd, "quit") && (args[2]==NULL))
   {
 
@@ -188,7 +298,7 @@ void ExeExternal(char **args, char* cmdString, Jobs& my_jobs, bool bg_flag)
 {
   // clear_memory;
     //ExeExternal(args, cmdString, my_jobs);
-    int* status;
+    int status;
     int pID = fork();
       if (pID != 0 && !bg_flag) {
           wait(&status);
@@ -210,7 +320,7 @@ void ExeExternal(char **args, char* cmdString, Jobs& my_jobs, bool bg_flag)
               my_jobs.add_job(string(args[0]), pID);
               if ( execv(args[0], args) == -1){
                   cerr << "smash error: > \"" << cmdString << "\"" << endl;
-                  kill(getpid(), SIGKILL);
+                  exit(EXIT_FAILURE);
               }
 
           default:

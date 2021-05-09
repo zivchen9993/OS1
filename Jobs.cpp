@@ -22,15 +22,18 @@ Jobs::Jobs(){
 };
 
 Jobs::~Jobs(){
-/*
-    list_last.clear();
-    list_hist.clear();
+/*  int cntr = (int)list_jobs.size();
+ for (list<SingleJob>::iterator itr = list_jobs.begin(); cntr > 0; itr++,
+    cntr--) {
+   delete list_jobs.remove(itr);
+  }
 */
 }
 
 bool Jobs::add_job(string p_name, int p_pid){
     process_counter++;
     system_clock::time_point p_time = std::chrono::system_clock::now();
+//    list_jobs.push_back(SingleJob(process_counter, p_name, p_pid, p_time));
     SingleJob *my_single_job = new SingleJob(process_counter, p_name, p_pid, p_time);
     list_jobs.push_back(*my_single_job);
     printf("add job end");
@@ -51,31 +54,48 @@ void Jobs::remove_jobs() {
         }
     }
 }
-/*
- * list<SingleJob>::iterator itr = list_jobs.begin();
-while (itr != items.end())
-{
-    bool isActive = (*i)->update();
-    if (!isActive)
-    {
-        items.erase(i++);  // alternatively, i = items.erase(i);
-    }
-    else
-    {
-        other_code_involving(*i);
-        ++i;
-    }
-}
- */
+
 int Jobs::change_signal(int p_num, bool signal){
     int cntr = (int)list_jobs.size();
     for (list<SingleJob>::iterator itr = list_jobs.begin(); cntr > 0; itr++, cntr--) {
         if (itr->get_proc_num() == p_num){
-            itr->change_signal(signal);
+            itr->change_single_sig(signal);
             return 0;
         }
     }
     return -1;
+}
+
+int Jobs::get_pid(int p_num){
+  int cntr = (int)list_jobs.size();
+  for (list<SingleJob>::iterator itr = list_jobs.begin(); cntr > 0; itr++, cntr--) {
+    if (itr->get_proc_num() == p_num){
+      return itr->get_job_pid();
+    }
+  }
+  return -1;
+}
+
+int Jobs::get_last_pid(){
+  return list_jobs.back().get_job_pid();
+}
+
+int Jobs::get_last_pnum(){
+  return list_jobs.back().get_proc_num();
+}
+
+bool Jobs::get_signal(int p_num){
+  int cntr = (int)list_jobs.size();
+  for (list<SingleJob>::iterator itr = list_jobs.begin(); cntr > 0; itr++, cntr--) {
+    if (itr->get_proc_num() == p_num){
+      return itr->get_job_signal();
+    }
+  }
+  return -1;
+}
+
+bool Jobs::get_last_signal(){
+  return list_jobs.back().get_job_signal();
 }
 
 void Jobs::print_jobs(){
@@ -85,6 +105,19 @@ void Jobs::print_jobs(){
     for (list<SingleJob>::iterator itr = list_jobs.begin(); cntr > 0; itr++, cntr--) {
         itr->print_single_job();
     }
+}
+
+void Jobs::print_job_name(int p_num){
+  int cntr = (int)list_jobs.size();
+  for (list<SingleJob>::iterator itr = list_jobs.begin(); cntr > 0; itr++, cntr--) {
+    if (itr->get_proc_num() == p_num){
+      cout << itr->get_proc_name() << endl;
+    }
+  }
+}
+
+void Jobs::print_last_name(){
+      cout << list_jobs.back().get_proc_name() << endl;
 }
 
 

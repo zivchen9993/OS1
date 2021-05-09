@@ -47,11 +47,15 @@ public:
 
     int get_proc_num();
 
-    void change_signal(bool signal);
+    std::string get_proc_name();
+
+    void change_single_sig(bool signal);
 
     void print_single_job();
 
     int get_job_pid();
+
+    bool get_job_signal();
 
 };
 

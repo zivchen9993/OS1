@@ -2,8 +2,7 @@
 #include<unistd.h>
 int main() {
     std::cout << "Hello World!";
-	unsigned int microsecond = 1000000;
-	usleep(300 * microsecond);//sleeps for 3 second
+	sleep(300);//sleeps for 3 second
 	std::cout << "Goodbye World!";
 	return 0;
 }

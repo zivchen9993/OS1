@@ -44,7 +44,11 @@ int SingleJob::get_proc_num(){
     return proc_num;
 }
 
-void SingleJob::change_signal(bool signal){
+std::string SingleJob::get_proc_name(){
+  return proc_name;
+}
+
+void SingleJob::change_single_sig(bool signal){
     is_stopped = signal;
 }
 
@@ -56,4 +60,8 @@ void SingleJob::print_single_job(){
 
 int SingleJob::get_job_pid(){
     return pid;
+}
+
+bool SingleJob::get_job_signal(){
+  return is_stopped;
 }

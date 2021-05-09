@@ -41,7 +41,21 @@ public:
 
     int change_signal(int p_num, bool signal);
 
+    int get_pid(int p_num);
+
+    int get_last_pid();
+
+    int get_last_pnum();
+
+    bool get_signal(int p_num);
+
+    bool get_last_signal();
+
     void print_jobs();
+
+    void print_job_name(int p_num);
+
+    void print_last_name();
 
 };
 

@@ -55,7 +55,7 @@ int main(int argc, char *argv[])
   Terminal *my_terminal = new Terminal();
   Jobs *my_jobs = new Jobs();
   my_jobs->add_job(std::string("add me"), getpid());
-  while (1)
+  while (true)
   {
     std::cerr << "smash > ";
     fgets(lineSize, MAX_LINE_SIZE, stdin);
