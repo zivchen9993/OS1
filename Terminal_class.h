@@ -16,14 +16,12 @@ class Terminal {
   std::list<std::list<std::string>> list_hist;
   int process_counter;
 
-
  public:
 
   /**
    * @brief Initiates an empty string
    */
   Terminal();
-
 
   ~Terminal();
 

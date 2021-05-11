@@ -16,7 +16,6 @@
 #include <string.h>
 #include <sys/types.h>
 #include <sys/wait.h>
-#include "Terminal_class.h"
 #include <fstream>
 #include <list>
 #include <iterator>
@@ -31,33 +30,35 @@ using namespace std::chrono;
 
 class SingleJob {
 
-    int proc_num;
-    std::string proc_name;
-    int pid;
-    system_clock::time_point start_time;
-    bool is_stopped;
+  int proc_num;
+  std::string proc_name;
+  int pid;
+  system_clock::time_point start_time;
+  bool is_stopped;
 
-public:
+ public:
 
-   // SingleJob();
+  // SingleJob();
 
-    SingleJob(int p_num, std::string p_name, int p_pid,  system_clock::time_point p_time);
+  SingleJob(int p_num,
+            std::string p_name,
+            int p_pid,
+            system_clock::time_point p_time);
 
-    ~SingleJob();
+  ~SingleJob();
 
-    int get_proc_num();
+  int get_proc_num();
 
-    std::string get_proc_name();
+  std::string get_proc_name();
 
-    void change_single_sig(bool signal);
+  void change_single_sig(bool signal);
 
-    void print_single_job();
+  void print_single_job();
 
-    int get_job_pid();
+  int get_job_pid();
 
-    bool get_job_signal();
+  bool get_job_signal();
 
 };
-
 
 #endif //SMASH_SINGLEJOB_H

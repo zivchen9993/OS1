@@ -12,14 +12,13 @@ main file. This file contains the main function of smash
 #include "signals.h"
 #define MAX_LINE_SIZE 80
 #define MAXARGS 20
-#define MAXPATHLEN 2048
 #include <iostream>
 #include <string.h>
 #include "Terminal_class.h"
 #include "Jobs.h"
 #include "signals.h"
 
-char* L_Fg_Cmd;
+char *L_Fg_Cmd;
 
 //void* jobs = NULL; //This represents the list of jobs. Please change to a preferred type (e.g array of char*)
 char lineSize[MAX_LINE_SIZE];
@@ -27,14 +26,13 @@ char lineSize[MAX_LINE_SIZE];
 Jobs *my_jobs = new Jobs();
 struct sigaction ctrl_c;
 struct sigaction ctrl_z;
-int current_pid = NULL;
-int smash_pid = NULL;
+int current_pid = -1;
+int smash_pid = -1;
 //**************************************************************************************
 // function name: main
 // Description: main function of smash. get command from user and calls command functions
 //**************************************************************************************
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
   char cmdString[MAX_LINE_SIZE];
 
 
@@ -51,43 +49,32 @@ int main(int argc, char *argv[])
 
   /************************************/
   // Init globals
-  char temp_path[MAXPATHLEN];
-  char *last_cd_tmp = new char[MAXPATHLEN + 1];
-  char *last_cd = new char[MAXPATHLEN + 1];
   smash_pid = getpid();
   ctrl_c.sa_handler = &handler_ctrl_c;
   ctrl_z.sa_handler = &handler_ctrl_z;
   sigaction(SIGINT, &ctrl_c, NULL);
   sigaction(SIGTSTP, &ctrl_z, NULL);
 
-  L_Fg_Cmd =(char*)malloc(sizeof(char)*(MAX_LINE_SIZE+1));
+  L_Fg_Cmd = (char *) malloc(sizeof(char) * (MAX_LINE_SIZE + 1));
   if (L_Fg_Cmd == NULL)
-    exit (-1);
+    exit(-1);
   L_Fg_Cmd[0] = '\0';
   Terminal *my_terminal = new Terminal();
- // Jobs *my_jobs = new Jobs();
-  my_jobs->add_job(std::string("add me"), getpid());
-  while (true)
-  {
-    std::cerr << "smash > ";
+  // Jobs *my_jobs = new Jobs();
+  while (true) {
+    std::cout << "smash > ";
     current_pid = getpid();
     fgets(lineSize, MAX_LINE_SIZE, stdin);
     strcpy(cmdString, lineSize);
-    cmdString[strlen(lineSize)-1]='\0';
+    cmdString[strlen(lineSize) - 1] = '\0';
     // background command
-    //if(!BgCmd(lineSize, *my_jobs)) continue;
     // built in commands BgCmd(int num_args, char *args[MAX_ARG], char* cmdString, Jobs& my_jobs)
     ExeCmd(*my_jobs, lineSize, cmdString, *my_terminal);
 
     /* initialize for next line read*/
-    lineSize[0]='\0';
-    cmdString[0]='\0';
+    lineSize[0] = '\0';
+    cmdString[0] = '\0';
   }
-  /**
-   * remmeber!
-   */
-  //clear_memory;
-  return 0;
 }
 
 

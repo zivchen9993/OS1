@@ -10,7 +10,6 @@ CMakeFiles/smash.dir/SingleJob.cpp.o
  /mnt/c/Users/ziv/CLionProjects/smash/Jobs.h
  /mnt/c/Users/ziv/CLionProjects/smash/SingleJob.cpp
  /mnt/c/Users/ziv/CLionProjects/smash/SingleJob.h
- /mnt/c/Users/ziv/CLionProjects/smash/Terminal_class.h
 CMakeFiles/smash.dir/Terminal_class.cpp.o
  /mnt/c/Users/ziv/CLionProjects/smash/Terminal_class.cpp
  /mnt/c/Users/ziv/CLionProjects/smash/Terminal_class.h
@@ -21,6 +20,8 @@ CMakeFiles/smash.dir/commands.cpp.o
  /mnt/c/Users/ziv/CLionProjects/smash/commands.cpp
  /mnt/c/Users/ziv/CLionProjects/smash/commands.h
 CMakeFiles/smash.dir/signals.cpp.o
+ /mnt/c/Users/ziv/CLionProjects/smash/Jobs.h
+ /mnt/c/Users/ziv/CLionProjects/smash/SingleJob.h
  /mnt/c/Users/ziv/CLionProjects/smash/signals.cpp
  /mnt/c/Users/ziv/CLionProjects/smash/signals.h
 CMakeFiles/smash.dir/smash.cpp.o

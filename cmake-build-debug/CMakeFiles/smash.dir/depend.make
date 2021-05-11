@@ -9,7 +9,6 @@ CMakeFiles/smash.dir/Jobs.cpp.o: ../Terminal_class.h
 CMakeFiles/smash.dir/SingleJob.cpp.o: ../Jobs.h
 CMakeFiles/smash.dir/SingleJob.cpp.o: ../SingleJob.cpp
 CMakeFiles/smash.dir/SingleJob.cpp.o: ../SingleJob.h
-CMakeFiles/smash.dir/SingleJob.cpp.o: ../Terminal_class.h
 
 CMakeFiles/smash.dir/Terminal_class.cpp.o: ../Terminal_class.cpp
 CMakeFiles/smash.dir/Terminal_class.cpp.o: ../Terminal_class.h
@@ -20,6 +19,8 @@ CMakeFiles/smash.dir/commands.cpp.o: ../Terminal_class.h
 CMakeFiles/smash.dir/commands.cpp.o: ../commands.cpp
 CMakeFiles/smash.dir/commands.cpp.o: ../commands.h
 
+CMakeFiles/smash.dir/signals.cpp.o: ../Jobs.h
+CMakeFiles/smash.dir/signals.cpp.o: ../SingleJob.h
 CMakeFiles/smash.dir/signals.cpp.o: ../signals.cpp
 CMakeFiles/smash.dir/signals.cpp.o: ../signals.h
 

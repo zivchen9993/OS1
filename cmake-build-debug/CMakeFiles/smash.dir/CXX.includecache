@@ -6,24 +6,6 @@
 
 #IncludeRegexTransform: 
 
-/mnt/c/Users/ziv/CLionProjects/smash/Jobs.cpp
-Jobs.h
-/mnt/c/Users/ziv/CLionProjects/smash/Jobs.h
-stdio.h
--
-string.h
--
-Terminal_class.h
-/mnt/c/Users/ziv/CLionProjects/smash/Terminal_class.h
-iostream
--
-list
--
-iterator
--
-vector
--
-
 /mnt/c/Users/ziv/CLionProjects/smash/Jobs.h
 unistd.h
 -
@@ -41,8 +23,6 @@ sys/types.h
 -
 sys/wait.h
 -
-Terminal_class.h
-/mnt/c/Users/ziv/CLionProjects/smash/Terminal_class.h
 SingleJob.h
 /mnt/c/Users/ziv/CLionProjects/smash/SingleJob.h
 fstream
@@ -56,26 +36,6 @@ cstring
 chrono
 -
 
-/mnt/c/Users/ziv/CLionProjects/smash/SingleJob.cpp
-SingleJob.h
-/mnt/c/Users/ziv/CLionProjects/smash/SingleJob.h
-Jobs.h
-/mnt/c/Users/ziv/CLionProjects/smash/Jobs.h
-stdio.h
--
-string.h
--
-Terminal_class.h
-/mnt/c/Users/ziv/CLionProjects/smash/Terminal_class.h
-iostream
--
-list
--
-iterator
--
-vector
--
-
 /mnt/c/Users/ziv/CLionProjects/smash/SingleJob.h
 unistd.h
 -
@@ -93,8 +53,6 @@ sys/types.h
 -
 sys/wait.h
 -
-Terminal_class.h
-/mnt/c/Users/ziv/CLionProjects/smash/Terminal_class.h
 fstream
 -
 list
@@ -120,22 +78,6 @@ iterator
 cstring
 -
 unistd.h
--
-
-/mnt/c/Users/ziv/CLionProjects/smash/commands.cpp
-commands.h
-/mnt/c/Users/ziv/CLionProjects/smash/commands.h
-iostream
--
-stdio.h
--
-string.h
--
-vector
--
-unistd.h
--
-ctype.h
 -
 
 /mnt/c/Users/ziv/CLionProjects/smash/commands.h
@@ -178,6 +120,10 @@ stdlib.h
 string.h
 -
 signal.h
+-
+Jobs.h
+/mnt/c/Users/ziv/CLionProjects/smash/Jobs.h
+iostream
 -
 
 /mnt/c/Users/ziv/CLionProjects/smash/smash.cpp
@@ -207,4 +153,6 @@ Terminal_class.h
 /mnt/c/Users/ziv/CLionProjects/smash/Terminal_class.h
 Jobs.h
 /mnt/c/Users/ziv/CLionProjects/smash/Jobs.h
+signals.h
+/mnt/c/Users/ziv/CLionProjects/smash/signals.h
 

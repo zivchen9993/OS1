@@ -13,7 +13,7 @@
 #include <string.h>
 #include <sys/types.h>
 #include <sys/wait.h>
-#include "Terminal_class.h"
+//#include "Terminal_class.h"
 #include "SingleJob.h"
 #include <fstream>
 #include <list>
@@ -26,42 +26,50 @@
 
 class Jobs {
 
-    std::list<SingleJob> list_jobs;
-    int process_counter;
+  std::list<SingleJob> list_jobs;
+  int process_counter;
+  std::string sig_names[65];
 
-public:
+ public:
 
-    Jobs();
+  Jobs();
 
-    ~Jobs();
+  ~Jobs();
 
-    bool add_job(std::string p_name, int p_pid);
+  void add_job(std::string p_name, int p_pid);
 
-    void remove_jobs();
+  void update_jobs_list();
 
-    int change_signal(int p_num, bool signal);
+  int change_signal(int p_num, bool signal);
 
-    int get_pid(int p_num);
+  int get_pid(int p_num);
 
-    int get_last_pid();
+  int get_last_pid();
 
-    int get_last_pnum();
+  int get_last_pnum();
 
-    bool get_signal(int p_num);
+  bool is_job_stopped(int p_num);
 
-    int get_num(int p_pid);
+  int get_num(int p_pid);
 
-    bool get_last_signal();
+  int last_job_stopped();
 
-    void print_jobs();
+  void print_all_jobs();
 
-    void kill_jobs();
+  void kill_jobs();
 
-    void print_job_name(int p_num);
+  void print_job_name(int p_num);
 
-    void print_last_name();
+  void print_last_name();
+
+  bool jobs_q_empty();
+
+  void print_sent_signal(int signal, int pid);
+
+  //bool is_pnum_exist(int p_num);
+
+  void init_sig_name();
 
 };
-
 
 #endif //SMASH_JOBS_H
