@@ -7,8 +7,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <signal.h>
-
-
-
+#include "Jobs.h"
+extern int smash_pid;
+extern int current_pid;
+void handler_ctrl_c(int signum);
+void handler_ctrl_z(int signum);
 #endif
 

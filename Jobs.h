@@ -49,9 +49,13 @@ public:
 
     bool get_signal(int p_num);
 
+    int get_num(int p_pid);
+
     bool get_last_signal();
 
     void print_jobs();
+
+    void kill_jobs();
 
     void print_job_name(int p_num);
 

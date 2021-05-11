@@ -72,6 +72,7 @@ int ExeCmd(Jobs& my_jobs, char* lineSize, char* cmdString, Terminal& my_terminal
   else if ((!strcmp(cmd, "pwd")) && (args[1]==NULL))
   {
     char temp[MAXPATHLEN];
+
     cout << ( getcwd(temp, sizeof(temp)) ? std::string( temp ) : std::string("") ) << endl;
   }
 
@@ -113,12 +114,14 @@ int ExeCmd(Jobs& my_jobs, char* lineSize, char* cmdString, Terminal& my_terminal
       int pid_last = my_jobs.get_last_pid();
       kill(pid_last, SIGCONT);
       my_jobs.change_signal(pnum_last, false);
+      current_pid = pid_last;
+      cout << current_pid << endl;
       wait(&pid_last);
     } else {
       int j = 0;
       bool is_dig_job;
       while ((args[1][j])) {
-        char letter = (args[2][j]);
+        char letter = (args[1][j]);
         is_dig_job = std::isdigit(letter);
         if (!is_dig_job) {
           cout << " smash error:> kill " << args[1] <<
@@ -131,6 +134,7 @@ int ExeCmd(Jobs& my_jobs, char* lineSize, char* cmdString, Terminal& my_terminal
       int pid = my_jobs.get_pid(pnum);
       kill(pid, SIGCONT);
       my_jobs.change_signal(pnum, false);
+      current_pid = pid;
       wait(&pid);
     }
   }
@@ -270,9 +274,15 @@ int ExeCmd(Jobs& my_jobs, char* lineSize, char* cmdString, Terminal& my_terminal
     }
   }
     /*************************************************/
-  else if (!strcmp(cmd, "quit") && (args[2]==NULL))
+  else if (!strcmp(cmd, "quit") && (args[1]==NULL))
   {
-
+	kill(getpid(),SIGTERM);
+  }
+    /*************************************************/
+  else if (!strcmp(cmd, "quit") && !strcmp(args[1],"kill") && (args[2]==NULL))
+  {
+	my_jobs.kill_jobs();
+	kill(getpid(),SIGTERM);
   }
     /*************************************************/
   else // external command
@@ -301,6 +311,8 @@ void ExeExternal(char **args, char* cmdString, Jobs& my_jobs, bool bg_flag)
     int status;
     int pID = fork();
       if (pID != 0 && !bg_flag) {
+    	  cerr << "waiting"  << endl;
+    	  current_pid = getpid();
           wait(&status);
       }
    //   my_jobs.add_job(string(args[0]));
@@ -315,7 +327,6 @@ void ExeExternal(char **args, char* cmdString, Jobs& my_jobs, bool bg_flag)
               // Child Process
               setpgrp();
               // Add your code here (execute an external command)
-              cout << ("t") << endl;
               my_jobs.add_job(std::string("case 0 add me"), getpid());
               my_jobs.add_job(string(args[0]), pID);
               if ( execv(args[0], args) == -1){
@@ -328,7 +339,6 @@ void ExeExternal(char **args, char* cmdString, Jobs& my_jobs, bool bg_flag)
               my_jobs.add_job(string(args[0]), pID);
               // Add your code here
 
-              cout << ("our default") << endl;
               /*
               your code
               */

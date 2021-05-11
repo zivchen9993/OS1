@@ -15,7 +15,7 @@
 
 #define MAX_LINE_SIZE 80
 #define MAX_ARG 20
-
+extern int current_pid;
 typedef enum { FALSE , TRUE } bool_;
 int ExeComp(char* lineSize);
 int BgCmd(int num_args, char **args, char* cmdString, Jobs& my_jobs);

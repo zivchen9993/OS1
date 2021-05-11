@@ -17,7 +17,6 @@
 
 using namespace std;
 Jobs::Jobs(){
-    printf("create job");
     process_counter = 0;
 };
 
@@ -36,14 +35,11 @@ bool Jobs::add_job(string p_name, int p_pid){
 //    list_jobs.push_back(SingleJob(process_counter, p_name, p_pid, p_time));
     SingleJob *my_single_job = new SingleJob(process_counter, p_name, p_pid, p_time);
     list_jobs.push_back(*my_single_job);
-    printf("add job end");
 }
 
 void Jobs::remove_jobs() {
-    printf("remove jobs before while loop");
     list<SingleJob>::iterator itr = list_jobs.begin();
     while (itr != list_jobs.end()) {
-        printf("remove jobs in while loop");
         int sig = kill((itr->get_job_pid()), 0);
         if (0 == sig) {
             itr++;
@@ -76,6 +72,16 @@ int Jobs::get_pid(int p_num){
   return -1;
 }
 
+int Jobs::get_num(int p_pid){
+  int cntr = (int)list_jobs.size();
+  for (list<SingleJob>::iterator itr = list_jobs.begin(); cntr > 0; itr++, cntr--) {
+    if (itr->get_proc_num() == p_pid){
+      return itr->get_proc_num();
+    }
+  }
+  return -1;
+}
+
 int Jobs::get_last_pid(){
   return list_jobs.back().get_job_pid();
 }
@@ -99,11 +105,23 @@ bool Jobs::get_last_signal(){
 }
 
 void Jobs::print_jobs(){
-    printf("before enter r_jobs");
     remove_jobs();
     int cntr = (int)list_jobs.size();
     for (list<SingleJob>::iterator itr = list_jobs.begin(); cntr > 0; itr++, cntr--) {
         itr->print_single_job();
+    }
+}
+
+void Jobs::kill_jobs(){
+    int cntr_term = (int)list_jobs.size();
+    for (list<SingleJob>::iterator itr = list_jobs.begin(); cntr_term > 0; itr++, cntr_term--) {
+        kill(itr->SingleJob::get_job_pid(), SIGTERM);
+    }
+    remove_jobs();
+    sleep(5);
+    int cntr_kill = (int)list_jobs.size();
+    for (list<SingleJob>::iterator itr = list_jobs.begin(); cntr_kill > 0; itr++, cntr_kill--) {
+    	kill(itr->SingleJob::get_job_pid(), SIGKILL);
     }
 }
 

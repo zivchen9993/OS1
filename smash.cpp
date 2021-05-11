@@ -17,11 +17,18 @@ main file. This file contains the main function of smash
 #include <string.h>
 #include "Terminal_class.h"
 #include "Jobs.h"
+#include "signals.h"
 
 char* L_Fg_Cmd;
 
 //void* jobs = NULL; //This represents the list of jobs. Please change to a preferred type (e.g array of char*)
 char lineSize[MAX_LINE_SIZE];
+
+Jobs *my_jobs = new Jobs();
+struct sigaction ctrl_c;
+struct sigaction ctrl_z;
+int current_pid = NULL;
+int smash_pid = NULL;
 //**************************************************************************************
 // function name: main
 // Description: main function of smash. get command from user and calls command functions
@@ -47,17 +54,23 @@ int main(int argc, char *argv[])
   char temp_path[MAXPATHLEN];
   char *last_cd_tmp = new char[MAXPATHLEN + 1];
   char *last_cd = new char[MAXPATHLEN + 1];
+  smash_pid = getpid();
+  ctrl_c.sa_handler = &handler_ctrl_c;
+  ctrl_z.sa_handler = &handler_ctrl_z;
+  sigaction(SIGINT, &ctrl_c, NULL);
+  sigaction(SIGTSTP, &ctrl_z, NULL);
 
   L_Fg_Cmd =(char*)malloc(sizeof(char)*(MAX_LINE_SIZE+1));
   if (L_Fg_Cmd == NULL)
     exit (-1);
   L_Fg_Cmd[0] = '\0';
   Terminal *my_terminal = new Terminal();
-  Jobs *my_jobs = new Jobs();
+ // Jobs *my_jobs = new Jobs();
   my_jobs->add_job(std::string("add me"), getpid());
   while (true)
   {
     std::cerr << "smash > ";
+    current_pid = getpid();
     fgets(lineSize, MAX_LINE_SIZE, stdin);
     strcpy(cmdString, lineSize);
     cmdString[strlen(lineSize)-1]='\0';
