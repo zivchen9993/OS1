@@ -11,6 +11,8 @@
 #include <vector>
 #include <unistd.h>
 #include <ctype.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 //********************************************
 // function name: ExeCmd
 // Description: interperts and executes built-in commands
@@ -53,13 +55,20 @@ int ExeCmd(Jobs &my_jobs,
 // MORE IF STATEMENTS AS REQUIRED
 /*************************************************/
   if (!strcmp(cmd, "cd")) {
+    if ((args[2] != NULL)) {
+      cerr << "smash error: > " << cmdString << endl;
+      return -1;
+    }
     if (!(strcmp(args[1], "-"))) {
       my_terminal.switch_addr();
-      chdir(my_terminal.last_dir());
+      int ret_val_chdir = chdir(my_terminal.last_dir());
+      if (ret_val_chdir == -1) {
+        perror("smash error");
+      }
     } else {
-      int ret_val_cdir = chdir(args[1]);
-      if (ret_val_cdir == -1) {
-        cerr << "smash error:> No such file or directory" << endl;
+      int ret_val_chdir = chdir(args[1]);
+      if (ret_val_chdir == -1) {
+        perror("smash error");
       } else {
         string tmp(args[1]);
         my_terminal.push_last_cwd(tmp);
@@ -68,44 +77,56 @@ int ExeCmd(Jobs &my_jobs,
   }
 
     /*************************************************/
-  else if ((!strcmp(cmd, "pwd")) && (args[1] == NULL)) {
+  else if (!strcmp(cmd, "pwd")) {
     char temp[MAXPATHLEN];
-
+    if (args[1] != NULL) {
+      cerr << "smash error: > " << cmdString << endl;
+      return -1;
+    }
     cout << (getcwd(temp, sizeof(temp)) ? std::string(temp) : std::string(""))
          << endl;
   }
-
     /*************************************************/
-    /**
-     *change this!!!! to syscall
-     */
-  else if (!strcmp(cmd, "cp") && (args[3] == NULL)) {
-    std::ifstream src(args[1], std::ios::binary);
-    std::ofstream dest(args[2], std::ios::binary);
-    dest << src.rdbuf();
-    if (src && dest) {
-      cout << args[1] << " has been copied to " << args[2] << endl;
+  else if (!strcmp(cmd, "cp")) {
+    if ((args[3] != NULL) || (args[2] == NULL)) {
+      cerr << "smash error: > " << cmdString << endl;
+      return -1;
     } else {
-      /**
-       * understand what error means!!!
-       */
-      perror("");
+      std::ifstream src(args[1], std::ios::binary);
+      std::ofstream dest(args[2], std::ios::binary);
+      dest << src.rdbuf();
+      if (src && dest) {
+        cout << args[1] << " has been copied to " << args[2] << endl;
+      } else {
+        perror("smash error");
+      }
     }
   }
     /*************************************************/
 
-  else if (!strcmp(cmd, "jobs") && (args[1] == NULL)) {
+  else if (!strcmp(cmd, "jobs")) {
+    if (args[1] != NULL) {
+      cerr << "smash error: > " << cmdString << endl;
+      return -1;
+    }
     my_jobs.print_all_jobs();
   }
     /*************************************************/
-  else if (!strcmp(cmd, "showpid") && (args[1] == NULL)) {
+  else if (!strcmp(cmd, "showpid")) {
+    if (args[1] != NULL) {
+      cerr << "smash error: > " << cmdString << endl;
+      return -1;
+    }
     cout << "smash pid is " << getpid() << endl;
   }
     /*************************************************/
-  else if (!strcmp(cmd, "fg") && (args[2] == NULL) && !(my_jobs.jobs_q_empty())
-      ) /// check forum about empty jobs list!!!!!!
+  else if (!strcmp(cmd, "fg") && (args[2] == NULL))
   {
     my_jobs.update_jobs_list();
+    if ((args[2] != NULL) || (my_jobs.jobs_q_empty())) {
+      cerr << "smash error: > " << cmdString << endl;
+      return -1;
+    }
     int status;
     if (args[1] == NULL) {
       int pnum_last = my_jobs.get_last_pnum();
@@ -123,16 +144,16 @@ int ExeCmd(Jobs &my_jobs,
         char letter = (args[1][j]);
         is_dig_job = std::isdigit(letter);
         if (!is_dig_job) {
-          cerr << "smash error:> kill " << args[1] <<
+          cerr << "smash error: > kill " << args[1] <<
                " - job does not exist " << endl;
           return 0;
         }
         j++;
       }
-      int pnum = atoi(args[1]);
+      int pnum = stoi(args[1]);
       int pid = my_jobs.get_pid(pnum);
       if (pid == -1) {
-        cerr << "smash error:> process doesnt exist " << endl;
+        cerr << "smash error: > process doesnt exist " << endl;
         return 0;
       }
       my_jobs.print_job_name(pnum);
@@ -144,10 +165,13 @@ int ExeCmd(Jobs &my_jobs,
     }
   }
     /*************************************************/
-  else if (!strcmp(cmd, "bg") && (args[2] == NULL)
-      && !(my_jobs.jobs_q_empty())) /// check forum about empty jobs list!!!!!!
+  else if (!strcmp(cmd, "bg") && (args[2] == NULL))
   {
     my_jobs.update_jobs_list();
+    if ((args[2] != NULL) || (my_jobs.jobs_q_empty())) {
+      cerr << "smash error: > " << cmdString << endl;
+      return -1;
+    }
     if (args[1] == NULL) {
       int pid_last_stopped;
       int last_stopped_pnum = my_jobs.last_job_stopped();
@@ -158,7 +182,7 @@ int ExeCmd(Jobs &my_jobs,
         kill(pid_last_stopped, SIGCONT);
         my_jobs.change_signal(last_stopped_pnum, false);
       } else {
-        cerr << "smash error:> kill - no stopped jobs " << endl;
+        cerr << "smash error: > kill - no stopped jobs " << endl;
       }
     } else {
       int j = 0;
@@ -167,15 +191,15 @@ int ExeCmd(Jobs &my_jobs,
         char letter = (args[1][j]);
         is_dig_job = std::isdigit(letter);
         if (!is_dig_job) {
-          cerr << "smash error:> not a number of job " << endl;
+          cerr << "smash error: > not a number of job " << endl;
           return 0;
         }
         j++;
       }
-      int pnum = atoi(args[1]);
+      int pnum = stoi(args[1]);
       int pid = my_jobs.get_pid(pnum);
       if (pid == -1) {
-        cerr << "smash error:> process doesnt exist " << endl;
+        cerr << "smash error: > process doesnt exist " << endl;
         return 0;
       }
       if (my_jobs.is_job_stopped(pnum)) {
@@ -183,16 +207,24 @@ int ExeCmd(Jobs &my_jobs,
         kill(pid, SIGCONT);
         my_jobs.change_signal(pnum, false);
       } else {
-        cerr << "smash error:> process isnt stopped " << endl;
+        cerr << "smash error: > process isnt stopped " << endl;
       }
     }
   }
     /*************************************************/
-  else if (!strcmp(cmd, "history") && (args[1] == NULL)) {
+  else if (!strcmp(cmd, "history")) {
+    if (args[1] != NULL) {
+      cerr << "smash error: > " << cmdString << endl;
+      return -1;
+    }
     my_terminal.print_hist();
   }
     /*************************************************/
-  else if (!strcmp(cmd, "diff") && (args[3] == NULL)) {
+  else if (!strcmp(cmd, "diff")) {
+    if (args[3] != NULL || (args[2] == NULL)) {
+      cerr << "smash error: > " << cmdString << endl;
+      return -1;
+    }
     fstream f1, f2;
     char name[80], c1, c2;
     int flag = 3;
@@ -201,13 +233,13 @@ int ExeCmd(Jobs &my_jobs,
     strcpy(name, args[1]);
     f1.open(name, ios::in);
     if (!(f1)) {
-      cerr << "1" << endl;
+      perror("smash error");
       correct_files = false;
     }
     strcpy(name, args[2]);
     f2.open(name, ios::in);
     if (!(f2) && correct_files) {
-      cerr << "1" << endl;
+      perror("smash error");
       correct_files = false;
     }
     while (correct_files) {
@@ -225,29 +257,33 @@ int ExeCmd(Jobs &my_jobs,
     f2.close();
     if (flag && correct_files) {
       cout << "0" << endl;
-    } else if (correct_files && !(flag)) {
+    } else if (correct_files) {
       cout << "1" << endl;
     }
   }
 
     /*************************************************/
-  else if (!strcmp(cmd, "kill") && (args[3] == NULL)) {
+  else if (!strcmp(cmd, "kill")) {
+    if (args[3] != NULL || (args[2] == NULL)) {
+      cerr << "smash error: > " << cmdString << endl;
+      return -1;
+    }
     int j = 0;
     bool is_dig_job;
     while ((args[2][j])) {
       char letter = (args[2][j]);
       is_dig_job = std::isdigit(letter);
       if (!is_dig_job) {
-        cerr << "smash error:> kill " << args[2] <<
+        cerr << "smash error: > kill " << args[2] <<
              " - job does not exist " << endl;
         return 0;
       }
       j++;
     }
-    int job_num = atoi(args[2]);
+    int job_num = stoi(args[2]);
     int needed_pid = my_jobs.get_pid(job_num);
     if (needed_pid == -1) {
-      cerr << "smash error:> kill " << args[2] <<
+      cerr << "smash error: > kill " << args[2] <<
            " - job does not exist " << endl;
       return 0;
     }
@@ -257,13 +293,13 @@ int ExeCmd(Jobs &my_jobs,
       char letter = args[1][i];
       is_dig_sig = std::isdigit(letter);
       if (!is_dig_sig) {
-        cerr << "smash error:> kill " <<
+        cerr << "smash error: > kill " <<
              " - cannot send signal " << endl;
         return 0;
       }
       i++;
     }
-    int sig_num = (-1 * atoi(args[1]));
+    int sig_num = (-1 * stoi(args[1]));
     if (((sig_num >= 1) && (sig_num <= 31)) ||
         ((sig_num >= 34) && (sig_num <= 64))) {
       my_jobs.print_sent_signal(sig_num, needed_pid);
@@ -275,27 +311,35 @@ int ExeCmd(Jobs &my_jobs,
           my_jobs.change_signal(job_num, false);
         }
       } else if (retval == -1) {
-        cerr << "smash error:> kill " <<
+        cerr << "smash error: > kill " <<
              " - cannot send signal " << endl;
       }
     } else {
-      cerr << "smash error:> kill " <<
+      cerr << "smash error: > kill " <<
            " - cannot send signal " << endl;
 
     }
   }
     /*************************************************/
-  else if (!strcmp(cmd, "quit") && (args[1] == NULL)) {
+  else if (!strcmp(cmd, "quit") &&
+          ((args[1] == NULL) || strcmp(args[1], "kill"))) {
+    if (args[1] != NULL) {
+      cerr << "smash error: > " << cmdString << endl;
+      return -1;
+    }
     int pid = getpid();
     my_jobs.print_sent_signal(SIGTERM, pid);
     kill(pid, SIGTERM);
   }
     /*************************************************/
-  else if (!strcmp(cmd, "quit") && !strcmp(args[1], "kill")
-      && (args[2] == NULL)) {
+  else if (!strcmp(cmd, "quit") && !strcmp(args[1], "kill")) {
+    if (args[2] != NULL) {
+      cerr << "smash error: > " << cmdString << endl;
+      return -1;
+    }
     my_jobs.kill_jobs();
     int pid = getpid();
-    my_jobs.print_sent_signal(SIGTERM, pid);
+    cout << "signal SIGTERM was sent to pid " << pid << endl;
     kill(pid, SIGTERM);
   }
     /*************************************************/
@@ -334,7 +378,7 @@ void ExeExternal(char **args, char *cmdString, Jobs &my_jobs, bool bg_flag) {
       setpgrp();
 
       if (execv(args[0], args) == -1) {
-        cerr << "smash error: > \"" << cmdString << "\"" << endl;
+        perror("smash error");
         exit(EXIT_FAILURE);
       }
 

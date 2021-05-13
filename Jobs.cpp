@@ -93,7 +93,6 @@ Jobs::~Jobs() {
 void Jobs::add_job(string p_name, int p_pid) {
   process_counter++;
   system_clock::time_point p_time = std::chrono::system_clock::now();
-//    list_jobs.push_back(SingleJob(process_counter, p_name, p_pid, p_time));
   SingleJob
       *my_single_job = new SingleJob(process_counter, p_name, p_pid, p_time);
   list_jobs.push_back(*my_single_job);
@@ -202,7 +201,7 @@ void Jobs::kill_jobs() {
   for (list<SingleJob>::iterator itr = list_jobs.begin(); cntr_kill > 0;
        itr++, cntr_kill--) {
     int pid = itr->SingleJob::get_job_pid();
-    cout << " 5 sec passed ";
+    cout << " 5 sec passed... ";
     print_sent_signal(SIGKILL, pid);
     kill(pid, SIGKILL);
   }

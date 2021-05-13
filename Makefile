@@ -3,7 +3,7 @@ CC = g++
 CFLAGS = -g -std=c++11 -Wall 
 CCLINK = $(CC)
 OBJS = smash.o commands.o signals.o Terminal_class.o Jobs.o SingleJob.o
-RM = rm -f
+RM = rm -rf
 # Creating the  executable
 smash: $(OBJS)
 	$(CCLINK) -o smash $(OBJS)
@@ -24,4 +24,4 @@ SingleJob.o: SingleJob.cpp SingleJob.h
 
 # Cleaning old files before new make
 clean:
-	$(RM) $(TARGET) *.o *~ "#"* core.*
+	$(RM) $(TARGET) *.o *~ "#"* core.* smash
